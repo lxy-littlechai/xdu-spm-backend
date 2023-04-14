@@ -9,6 +9,7 @@ var patronRouter = require('./routes/Patron');
 var staffRouter = require('./routes/Staff');
 var administrator = require('./routes/Administrator');
 var login = require('./routes/Login');
+var superuser = require('./routes/Superuser');
 
 var app = express();
 
@@ -35,6 +36,7 @@ app.use('/Patron', patronRouter);
 app.use('/Staff', staffRouter);
 app.use('/Administrator', administrator);
 app.use('/Login', login);
+app.use('/Superuser', superuser);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
