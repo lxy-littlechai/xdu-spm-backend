@@ -8,8 +8,14 @@ const db = require('./database')
 router.post('/GetBookByISBN', (req, res) => {
   const data = req.body;
 
-  const sql = `select * from booklist where ISBN = "${data.ISBN}"`;
+  let sql = `select * from booklist where ISBN = "${data.ISBN}"`;
   db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Staff", "${data.activeUser}", "GetBookByISBN", "${err ? err : data.ISBN}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
 
     if (err) {
       console.log(err)
@@ -26,16 +32,23 @@ router.post('/GetBookByISBN', (req, res) => {
     });
 
   });
+
+
 })
 
 // 加书
 router.post('/AddBook', (req, res) => {
   const data = req.body;
   console.log(data)
-  const sql = `insert into booklist values(
+  let sql = `insert into booklist values(
     "${data.id}","${data.name}","${data.author}",${data.resNumber},"${data.ISBN}","${data.img}"
     )`;
   db.query(sql, (err, result) => {
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Staff", "${data.activeUser}", "AddBook", "${err ? err : data}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
 
     if (err) {
       console.log(err)
@@ -45,6 +58,7 @@ router.post('/AddBook', (req, res) => {
       });
       return;
     }
+
     res.json({
       status: "200",
       success: true
@@ -57,7 +71,7 @@ router.post('/AddBook', (req, res) => {
 router.post('/UpdateBook', (req, res) => {
   const data = req.body;
 
-  const sql = `update booklist set
+  let sql = `update booklist set
     id = "${data.id}",
     name = "${data.name}",
     author = "${data.author}",
@@ -65,6 +79,12 @@ router.post('/UpdateBook', (req, res) => {
     img = "${data.img}" 
     where ISBN = "${data.ISBN}"`;
   db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Staff", "${data.activeUser}", "UpdateBook", "${err ? err : data}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
 
     if (err) {
       console.log(err)
@@ -86,8 +106,14 @@ router.post('/UpdateBook', (req, res) => {
 router.post('/DeleteBook', (req, res) => {
   const data = req.body;
 
-  const sql = `delete from booklist where ISBN = "${data.ISBN}"`;
+  let sql = `delete from booklist where ISBN = "${data.ISBN}"`;
   db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Staff", "${data.activeUser}", "DeleteBook", "${err ? err : data.ISBN}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
 
     if (err) {
       console.log(err)
@@ -109,24 +135,31 @@ router.post('/DeleteBook', (req, res) => {
 router.post('/BorrowBook', (req, res) => {
   const data = req.body;
 
-  const sql = `update booklist set
+  let sql = `update booklist set
     resNumber = resNumber - 1
     where ISBN = "${data.ISBN}"`;
   db.query(sql, (err, result) => {
 
-    if (err) {
-      console.log(err)
-      res.json({
-        status: "500",
-        success: false
-      });
-      return;
-    }
-    const sql = `insert into borrowedbook values(
-      "${data.name}", "${data.ISBN}", "${data.startTime}", 0
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into borrowedbook values(
+      "${data.name}", "${data.ISBN}", "${data.startTime}", 0, 0
     )`
     db.query(sql, (err, result) => {
       if (err) {
+
+        sql = `insert into log values(
+          0, "Staff", "${data.activeUser}", "BorrowBook", "${err ? err : data.ISBN}", "${date}"
+        )`
+        db.query(sql, (err, result) => { });
+
+        if (err) {
+          console.log(err)
+          res.json({
+            status: "500",
+            success: false
+          });
+          return;
+        }
         console.log(err)
         res.json({
           status: "500",
@@ -148,7 +181,7 @@ router.post('/BorrowBook', (req, res) => {
 router.post('/ReturnBook', (req, res) => {
   const data = req.body;
   console.log(data)
-  const sql = `update booklist set
+  let sql = `update booklist set
     resNumber = resNumber + 1
     where ISBN = "${data.ISBN}"`;
   db.query(sql, (err, result) => {
@@ -163,10 +196,17 @@ router.post('/ReturnBook', (req, res) => {
       });
       return;
     }
-    const sql = `delete from borrowedbook where borrowId = "${data.borrowId}"`
+    sql = `delete from borrowedbook where borrowId = "${data.borrowId}"`
     db.query(sql, (err, result) => {
       if (err) {
         console.log(err)
+
+        const date = String(new Date()).slice(0, 24);
+        sql = `insert into log values(
+          0, "Staff", "${data.activeUser}", "ReturnBook", "${err ? err : data.ISBN}", "${date}"
+        )`
+        db.query(sql, (err, result) => { });
+
         res.json({
           status: "500",
           data: {
@@ -180,6 +220,58 @@ router.post('/ReturnBook', (req, res) => {
         success: true
       });
     })
+
+  });
+})
+
+// 确认支付
+router.post('/confirmPay', (req, res) => {
+  const data = req.body;
+
+  let sql = `select ifPay from borrowedbook where borrowId = "${data.borrowId}"`;
+  db.query(sql, (err, result) => {
+    console.log(result[0])
+    if (err) {
+      console.log(err)
+      res.json({
+        status: "500",
+        success: false
+      });
+      return;
+    }
+    res.json({
+      status: "200",
+      success: result[0].ifPay
+    });
+
+  });
+})
+
+//支付
+router.post('/payFee', (req, res) => {
+  const data = req.body;
+  console.log(data)
+  let sql = `update borrowedbook set ifPay = 1 where borrowId = "${data.borrowId}"`;
+  db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Patron", "${data.activeUser}", "payFee", "${err ? err : data.username + "pay " + data.borrowId}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
+
+    if (err) {
+      console.log(err)
+      res.json({
+        status: "500",
+        success: false
+      });
+      return;
+    }
+    res.json({
+      status: "200",
+      success: true
+    });
 
   });
 })

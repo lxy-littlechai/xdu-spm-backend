@@ -18,6 +18,12 @@ router.post('/GetAccount', (req, res) => {
 
   db.query(sql, (err, result) => {
 
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Administrator", "${data.activeUser}", "GetAccount", "${err ? err : data.username}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
+
     if (err) {
       console.log(err)
       res.json({
@@ -42,10 +48,16 @@ router.post('/CreateAccount', (req, res) => {
   const data = req.body;
   console.log(data)
 
-  const sql = `insert into user values(
+  let sql = `insert into user values(
     "${data.username}","${data.password}","${data.permission}"
     )`;
   db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Administrator", "${data.activeUser}", "CreateAccount", "${err ? err : data}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
 
     if (err) {
       console.log(err)
@@ -67,10 +79,16 @@ router.post('/CreateAccount', (req, res) => {
 router.post('/ChangePermission', (req, res) => {
   const data = req.body;
   console.log(data)
-  const sql = `update user set
+  let sql = `update user set
     permission = "${data.permission}"
     where username = "${data.username}"`;
   db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Administrator", "${data.activeUser}", "ChangePermission", "${err ? err : data}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
 
     if (err) {
       console.log(err)

@@ -19,29 +19,39 @@ router.post('/BookSearch', (req, res) => {
     default:
       break;
   }
-  const sql = 'SELECT * FROM booklist ' + op;
+  let sql = 'SELECT * FROM booklist ' + op;
   db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Patron", "${data.activeUser}", "BookSearch", "${err ? err : data.label + " " + data.content}", "${date}"
+    )`
+    db.query(sql, (err, row) => { })
 
     if (err) {
       return;
     }
-    // res：API传数据
-    // result：返回的数据，需要转成JSON格式
     res.json({
       status: "200",
       result
     });
-
   });
+
 })
 
 //查已借的书
 router.post('/GetBorrowedBook', (req, res) => {
   console.log(req.body)
   const username = req.body.username;
-  const sql = `SELECT * FROM borrowedbook as bo, booklist as list 
+  let sql = `SELECT * FROM borrowedbook as bo, booklist as list 
                where bo.username = "${username}" and list.ISBN = bo.ISBN`;
   db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+        0, "Patron", "${username}","GetBorrowedBook", "${err ? err : 'success'}", "${date}"
+      )`
+    db.query(sql, (err, row) => { })
 
     if (err) {
       return;
@@ -54,6 +64,8 @@ router.post('/GetBorrowedBook', (req, res) => {
     });
 
   });
+
+
 })
 
 module.exports = router;

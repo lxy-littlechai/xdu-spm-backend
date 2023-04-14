@@ -9,11 +9,19 @@ router.post('', (req, res) => {
   const data = req.body;
   console.log(data)
 
-  const sql = `select permission from user where
+  let sql = `select permission from user where
    username = "${data.username}" and
    password = "${data.password}"
    `;
   db.query(sql, (err, result) => {
+
+    const permission = result[0].permission;
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "${permission}", "${data.username}", "Login", "${err ? err : 'success'}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
+
     console.log(result == false)
     if (err || result == false) {
       console.log(err)
@@ -29,6 +37,8 @@ router.post('', (req, res) => {
     });
 
   });
+
+
 })
 
 module.exports = router;
