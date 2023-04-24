@@ -14,13 +14,9 @@ router.post('', (req, res) => {
    password = "${data.password}"
    `;
   db.query(sql, (err, result) => {
+    console.log(result)
 
-    const permission = result[0].permission;
-    const date = String(new Date()).slice(0, 24);
-    sql = `insert into log values(
-      0, "${permission}", "${data.username}", "Login", "${err ? err : 'success'}", "${date}"
-    )`
-    db.query(sql, (err, result) => { });
+
 
     console.log(result == false)
     if (err || result == false) {
@@ -31,6 +27,13 @@ router.post('', (req, res) => {
       });
       return;
     }
+    const permission = result[0].permission;
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "${permission}", "${data.username}", "Login", "${err ? err : 'success'}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
+
     res.json({
       success: true,
       ...result[0]

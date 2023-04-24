@@ -9,8 +9,8 @@ router.post('/GetAccount', (req, res) => {
   const data = req.body;
   console.log(data)
 
-  let sql = `select * from user where permission != "Administrator"`;
-  const op = `and username = "${data.username}"`;
+  let sql = `select * from user `;
+  const op = `where username = "${data.username}"`;
 
   if (data.username != "") {
     sql += op;
@@ -57,6 +57,34 @@ router.post('/CreateAccount', (req, res) => {
     sql = `insert into log values(
       0, "Administrator", "${data.activeUser}", "CreateAccount", "${err ? err : data}", "${date}"
     )`
+    db.query(sql, (err, result) => { });
+
+    if (err) {
+      console.log(err)
+      res.json({
+        status: "500",
+        success: false
+      });
+      return;
+    }
+    res.json({
+      status: "200",
+      success: true
+    });
+
+  });
+})
+
+// 删除用户
+router.post('/DeleteAccount', (req, res) => {
+  const data = req.body;
+  console.log(data)
+
+  let sql = `delete from user where username = "${data.username}"`;
+  db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `delete from user where username = "${data.username}`
     db.query(sql, (err, result) => { });
 
     if (err) {
