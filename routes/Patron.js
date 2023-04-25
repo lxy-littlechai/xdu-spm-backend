@@ -68,5 +68,34 @@ router.post('/GetBorrowedBook', (req, res) => {
 
 })
 
+//查历史借书
+router.post('/GetHistoricalBook', (req, res) => {
+  console.log(req.body)
+  const username = req.body.username;
+  let sql = `SELECT * FROM historical_borrowed_book as bo, booklist as list 
+              where bo.username = "${username}" and list.ISBN = bo.ISBN`;
+  db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+        0, "Patron", "${username}","GetHistoricalBook", "${err ? err : 'success'}", "${date}"
+      )`
+    db.query(sql, (err, row) => { })
+
+    if (err) {
+      return;
+    }
+    // res：API传数据
+    // result：返回的数据，需要转成JSON格式
+    res.json({
+      status: "200",
+      result
+    });
+
+  });
+
+
+})
+
 module.exports = router;
 

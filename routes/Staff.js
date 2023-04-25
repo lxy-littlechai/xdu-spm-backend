@@ -1,12 +1,15 @@
 var express = require('express');
 var router = express.Router();
 
+
+
 // 引入数据库配置文件
 const db = require('./database')
 
 //ISBN查书
 router.post('/GetBookByISBN', (req, res) => {
   const data = req.body;
+
 
   let sql = `select * from booklist where ISBN = "${data.ISBN}"`;
   db.query(sql, (err, result) => {
@@ -145,21 +148,15 @@ router.post('/BorrowBook', (req, res) => {
       "${data.name}", "${data.ISBN}", "${data.startTime}", 0, 0
     )`
     db.query(sql, (err, result) => {
+      sql = `insert into log values(
+        0, "Staff", "${data.activeUser}", "BorrowBook", "${err ? err : data.ISBN}", "${date}"
+      )`
+      db.query(sql, (err, result) => { });
+      sql = `insert into historical_borrowed_book values(
+        "${data.name}", "${data.ISBN}", 0
+      )`
+      db.query(sql, (err, result) => { });
       if (err) {
-
-        sql = `insert into log values(
-          0, "Staff", "${data.activeUser}", "BorrowBook", "${err ? err : data.ISBN}", "${date}"
-        )`
-        db.query(sql, (err, result) => { });
-
-        if (err) {
-          console.log(err)
-          res.json({
-            status: "500",
-            success: false
-          });
-          return;
-        }
         console.log(err)
         res.json({
           status: "500",
@@ -167,6 +164,7 @@ router.post('/BorrowBook', (req, res) => {
         });
         return;
       }
+
       res.json({
         status: "200",
         success: true
