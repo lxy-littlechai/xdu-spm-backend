@@ -6,6 +6,69 @@ var router = express.Router();
 // 引入数据库配置文件
 const db = require('./database')
 
+// 本地数据库加书
+router.post('/AddBookToLocal', (req, res) => {
+  const data = req.body;
+
+  let sql = `insert into LocalDB values(
+    "${data.name}","${data.author}","${data.ISBN}","${data.img}"
+    )`;
+  db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Staff", "${data.activeUser}", "addBookToLocal", "${err ? err : data.ISBN}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
+
+    if (err) {
+      console.log(err)
+      res.json({
+        status: "500",
+        success: false
+      });
+      return;
+    }
+    res.json({
+      status: "200",
+      success: true,
+      result,
+    });
+  })
+})
+//本地数据库查书
+router.post('/GetBookFromLocal', (req, res) => {
+  const data = req.body;
+
+
+  let sql = `select * from LocalDB where ISBN = "${data.ISBN}"`;
+  db.query(sql, (err, result) => {
+
+    const date = String(new Date()).slice(0, 24);
+    sql = `insert into log values(
+      0, "Staff", "${data.activeUser}", "GetBookFromLocal", "${err ? err : data.ISBN}", "${date}"
+    )`
+    db.query(sql, (err, result) => { });
+
+    if (err || !result[0]) {
+      console.log(err)
+      res.json({
+        status: "500",
+        success: false
+      });
+      return;
+    }
+    res.json({
+      status: "200",
+      success: true,
+      result,
+    });
+
+  });
+
+
+})
+
 //ISBN查书
 router.post('/GetBookByISBN', (req, res) => {
   const data = req.body;
@@ -44,7 +107,7 @@ router.post('/AddBook', (req, res) => {
   const data = req.body;
   console.log(data)
   let sql = `insert into booklist values(
-    "${data.id}","${data.name}","${data.author}",${data.resNumber},"${data.ISBN}","${data.img}"
+    "${data.id}","${data.name}","${data.author}",${data.resNumber},"${data.ISBN}","${data.img}","${data.location}"
     )`;
   db.query(sql, (err, result) => {
     const date = String(new Date()).slice(0, 24);
@@ -79,7 +142,8 @@ router.post('/UpdateBook', (req, res) => {
     name = "${data.name}",
     author = "${data.author}",
     resNumber = ${data.resNumber},
-    img = "${data.img}" 
+    img = "${data.img}",
+    location = "${data.location}" 
     where ISBN = "${data.ISBN}"`;
   db.query(sql, (err, result) => {
 
