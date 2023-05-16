@@ -201,6 +201,7 @@ router.post('/DeleteBook', (req, res) => {
 // 借书
 router.post('/BorrowBook', (req, res) => {
   const data = req.body;
+  console.log(data)
 
   let sql = `update booklist set
     resNumber = resNumber - 1
@@ -209,15 +210,15 @@ router.post('/BorrowBook', (req, res) => {
 
     const date = String(new Date()).slice(0, 24);
     sql = `insert into borrowedbook values(
-      "${data.name}", "${data.ISBN}", "${data.startTime}", 0, 0
+      "${data.username}", "${data.ISBN}", "${data.startTime}", 0, 0
     )`
     db.query(sql, (err, result) => {
       sql = `insert into log values(
-        0, "Staff", "${data.activeUser}", "BorrowBook", "${err ? err : data.ISBN}", "${date}"
+        0, "Staff", "${data.username}", "BorrowBook", "${err ? err : data.ISBN}", "${date}"
       )`
       db.query(sql, (err, result) => { });
       sql = `insert into historical_borrowed_book values(
-        "${data.name}", "${data.ISBN}", 0
+        "${data.username}", "${data.ISBN}", 0, "${data.startTime}"
       )`
       db.query(sql, (err, result) => { });
       if (err) {
