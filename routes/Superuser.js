@@ -3,6 +3,7 @@ var router = express.Router();
 
 // 引入数据库配置文件
 const db = require('./database');
+const exec = require('child_process').exec;
 
 //查日志
 router.post('/Log', (req, res) => {
@@ -46,7 +47,29 @@ router.post('/GetAllUser', (req, res) => {
   })
 })
 
+//备份数据库
+router.post('/BackUpDB', (req, res) => {
+  let cmd = `mysqldump -uspm -proot spm > C:/spm/backup/spm_bk.db`
+  exec(cmd, (error, stdout, stderr) => {
+    console.log(error, stdout, stderr);
+    res.json({
+      status: "200",
+      success: true
+    })
+  })
+})
 
+//还原数据库
+router.post('/RestoreDB', (req, res) => {
+  let cmd = `mysql -uspm -proot spm < C:/spm/backup/spm_bk.db `
+  exec(cmd, (error, stdout, stderr) => {
+    console.log(error, stdout, stderr);
+    res.json({
+      status: "200",
+      success: true
+    })
+  })
+})
 
 
 
