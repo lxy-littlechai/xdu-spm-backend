@@ -172,30 +172,42 @@ router.post('/UpdateBook', (req, res) => {
 // 删除书
 router.post('/DeleteBook', (req, res) => {
   const data = req.body;
-
-  let sql = `delete from booklist where ISBN = "${data.ISBN}"`;
+  let sql = `select * from borrowedbook where ISBN = "${data.ISBN}"`;
   db.query(sql, (err, result) => {
+    console.log(result)
+    if (!result.length) {
+      sql = `delete from booklist where ISBN = "${data.ISBN}"`;
+      db.query(sql, (err, result) => {
 
-    const date = String(new Date()).slice(0, 24);
-    sql = `insert into log values(
-      0, "Staff", "${data.activeUser}", "DeleteBook", "${err ? err : data.ISBN}", "${date}"
-    )`
-    db.query(sql, (err, result) => { });
+        const date = String(new Date()).slice(0, 24);
+        sql = `insert into log values(
+          0, "Staff", "${data.activeUser}", "DeleteBook", "${err ? err : data.ISBN}", "${date}"
+        )`
+        db.query(sql, (err, result) => { });
 
-    if (err) {
-      console.log(err)
-      res.json({
-        status: "500",
-        success: false
+        if (err) {
+          console.log(err)
+          res.json({
+            status: "500",
+            success: false
+          });
+          return;
+        }
+        res.json({
+          status: "200",
+          success: true
+        });
+
       });
-      return;
     }
-    res.json({
-      status: "200",
-      success: true
-    });
-
+    else {
+      res.json({
+        success: false
+      })
+    }
   });
+
+
 })
 
 // 借书
