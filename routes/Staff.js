@@ -218,7 +218,7 @@ router.post('/BorrowBook', (req, res) => {
       )`
       db.query(sql, (err, result) => { });
       sql = `insert into historical_borrowed_book values(
-        "${data.username}", "${data.ISBN}", 0, "${data.startTime}"
+        "${data.username}", "${data.ISBN}", 0, "${data.startTime}", "on loan"
       )`
       db.query(sql, (err, result) => { });
       if (err) {
@@ -263,13 +263,6 @@ router.post('/ReturnBook', (req, res) => {
     db.query(sql, (err, result) => {
       if (err) {
         console.log(err)
-
-        const date = String(new Date()).slice(0, 24);
-        sql = `insert into log values(
-          0, "Staff", "${data.activeUser}", "ReturnBook", "${err ? err : data.ISBN}", "${date}"
-        )`
-        db.query(sql, (err, result) => { });
-
         res.json({
           status: "500",
           data: {
@@ -278,6 +271,16 @@ router.post('/ReturnBook', (req, res) => {
         });
         return;
       }
+      const date = String(new Date()).slice(0, 24);
+      sql = `insert into log values(
+          0, "Staff", "${data.activeUser}", "ReturnBook", "${err ? err : data.ISBN}", "${date}"
+        )`
+      db.query(sql, (err, result) => { });
+
+      sql = `update historical_borrowed_book set status = "returned"`
+      db.query(sql, (err, result) => { });
+
+
       res.json({
         status: "200",
         success: true
