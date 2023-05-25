@@ -4,7 +4,7 @@ var router = express.Router();
 
 
 // 引入数据库配置文件
-const db = require('./database')
+const db = require('../api/database')
 
 // 本地数据库加书
 router.post('/AddBookToLocal', (req, res) => {

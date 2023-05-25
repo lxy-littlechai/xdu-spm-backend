@@ -11,7 +11,11 @@ var administrator = require('./routes/Administrator');
 var login = require('./routes/Login');
 var superuser = require('./routes/Superuser');
 
+var system = require('./api/system.js');
+
 var app = express();
+
+system.sendEmail.start();
 
 app.all('*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');

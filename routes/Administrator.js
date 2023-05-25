@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 // 引入数据库配置文件
-const db = require('./database')
+const db = require('../api/database')
 
 // 查找用户
 router.post('/GetAccount', (req, res) => {
@@ -49,7 +49,7 @@ router.post('/CreateAccount', (req, res) => {
   console.log(data)
 
   let sql = `insert into user values(
-    "${data.username}","${data.password}","${data.permission}"
+    "${data.username}","${data.password}","${data.permission}","${data.email}"
     )`;
   db.query(sql, (err, result) => {
 

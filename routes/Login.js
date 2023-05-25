@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 // 引入数据库配置文件
-const db = require('./database');
+const db = require('../api/database');
 
 //登入
 router.post('', (req, res) => {

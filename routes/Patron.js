@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 // 引入数据库配置文件
-const db = require('./database')
+const db = require('../api/database')
 
 // 根据label查书
 router.post('/BookSearch', (req, res) => {
