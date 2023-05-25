@@ -72,7 +72,7 @@ router.post('/GetBorrowedBook', (req, res) => {
 router.post('/GetHistoricalBook', (req, res) => {
   console.log(req.body)
   const username = req.body.username;
-  let sql = `SELECT * FROM historical_borrowed_book as bo, booklist as list 
+  let sql = `SELECT * FROM historical_borrowed_book as bo, booklist as list, borrowedbook 
               where bo.username = "${username}" and list.ISBN = bo.ISBN`;
   db.query(sql, (err, result) => {
 

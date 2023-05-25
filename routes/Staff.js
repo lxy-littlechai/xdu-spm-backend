@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const alipay = require('../api/alipay/createOrder');
 
 
 
@@ -222,7 +223,7 @@ router.post('/BorrowBook', (req, res) => {
 
     const date = String(new Date()).slice(0, 24);
     sql = `insert into borrowedbook values(
-      "${data.username}", "${data.ISBN}", "${data.startTime}", 0, 0
+      "${data.username}", "${data.ISBN}", "${data.startTime}", 0, 0, default, default
     )`
     db.query(sql, (err, result) => {
       sql = `insert into log values(
@@ -305,6 +306,7 @@ router.post('/ReturnBook', (req, res) => {
 // 确认支付
 router.post('/confirmPay', (req, res) => {
   const data = req.body;
+  console.log('确认支付', data)
 
   let sql = `select ifPay from borrowedbook where borrowId = "${data.borrowId}"`;
   db.query(sql, (err, result) => {
@@ -352,6 +354,17 @@ router.post('/payFee', (req, res) => {
     });
 
   });
+})
+
+//阿里沙盒支付
+router.post('/alipay', async (req, res) => {
+  let result = await alipay.createOrder(req.body)
+  console.log(result)
+  res.json({
+    status: 200,
+    result,
+    success: true
+  })
 })
 
 module.exports = router;
