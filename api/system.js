@@ -44,5 +44,6 @@ const sendEmailDaily = cron.schedule("* * * * *", () => {
 
 
 module.exports = {
+  freeKeepDaysUpdate,
   sendEmailDaily
 }
