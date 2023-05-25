@@ -134,4 +134,29 @@ router.post('/ChangePermission', (req, res) => {
   });
 })
 
+// 系统参数设置
+router.post('/SetSystemOption', (req, res) => {
+  const data = req.body;
+  let sql = `update \`system\` set
+  feeAmt = "${data.feeAmt}",
+  borrowLimit = "${data.borrowLimit}"
+  where mode = "1"
+  `
+  db.query(sql, (err, result) => {
+    if (err) {
+      res.json({
+        status: 200,
+        success: false
+      })
+      console.log(err)
+      return;
+    }
+    res.json({
+      status: 200,
+      success: true
+    })
+  })
+
+})
+
 module.exports = router;
