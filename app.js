@@ -15,7 +15,8 @@ var system = require('./api/system.js');
 
 var app = express();
 
-system.sendEmail.start();
+system.freeKeepDaysUpdate.start();
+system.sendEmailDaily.start();
 
 app.all('*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
