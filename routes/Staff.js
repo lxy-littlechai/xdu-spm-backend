@@ -293,6 +293,9 @@ router.post('/ReturnBook', (req, res) => {
       sql = `update historical_borrowed_book set status = "returned"`
       db.query(sql, (err, result) => { });
 
+      sql = `update \`system\` set totalFee = totalFee + ${data.fee} where mode = 1`
+      db.query(sql, (err, result) => { });
+
 
       res.json({
         status: "200",

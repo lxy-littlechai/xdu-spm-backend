@@ -72,8 +72,11 @@ router.post('/GetBorrowedBook', (req, res) => {
 router.post('/GetHistoricalBook', (req, res) => {
   console.log(req.body)
   const username = req.body.username;
-  let sql = `SELECT * FROM historical_borrowed_book as bo, booklist as list, borrowedbook 
-              where bo.username = "${username}" and list.ISBN = bo.ISBN`;
+  let sql = `SELECT * FROM spm.historical_borrowed_book his natural join spm.booklist
+  left join 
+  (select ifPay, freeKeepDays, fee, borrowId  from spm.borrowedbook) as A
+  on his.borrowId  = A.borrowId
+  `;
   db.query(sql, (err, result) => {
 
     const date = String(new Date()).slice(0, 24);
