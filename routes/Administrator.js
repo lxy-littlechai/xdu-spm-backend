@@ -159,4 +159,26 @@ router.post('/SetSystemOption', (req, res) => {
 
 })
 
+router.post('/GetSystemOption', (req, res) => {
+  const data = req.body;
+  let sql = `select * from \`system\` 
+  `
+  db.query(sql, (err, result) => {
+    if (err) {
+      res.json({
+        status: 200,
+        success: false
+      })
+      console.log(err)
+      return;
+    }
+    res.json({
+      status: 200,
+      success: true,
+      result
+    })
+  })
+
+})
+
 module.exports = router;
